@@ -20,13 +20,16 @@ function islandora_oralhistories_preprocess_islandora_oralhistories(array &$vari
   $module_path = drupal_get_path('module', 'islandora_oralhistories');
 
   // Add required bootstrap-select css and js files.
-  drupal_add_css('//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.4/css/bootstrap-select.min.css', 'external');
-  drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.4/js/bootstrap-select.min.js', 'external');
-
+  drupal_add_css('//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css', 'external');
+  drupal_add_js('//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js', 'external');
+  
   // Add videojs.
-  drupal_add_css($module_path . '/lib/videojs/video-js.css');
-  drupal_add_js($module_path . '/lib/videojs/videojs.js');
-
+  //drupal_add_css($module_path . '/lib/videojs/video-js.css');
+  //drupal_add_js($module_path . '/lib/videojs/videojs.js');
+  
+  $videojs_path = libraries_get_path("video-js");
+  drupal_add_js($videojs_path . "/video.js");
+  drupal_add_css($videojs_path . '/video-js.css');
   // Use jquery.ui tabs.
   drupal_add_library('system', 'ui.tabs');
 

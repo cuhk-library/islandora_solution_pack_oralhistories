@@ -17,6 +17,9 @@
                         $('.next', this).click(function () {
                             $scroller.next();
                         });
+                        $('.playall', this).click(function () {
+                            $scroller.continuePlay();
+                        });
                     }
                 });
         }

@@ -9,7 +9,8 @@
 
                     var $tierSelector = $('.tier-selector', this);
                     $tierSelector.find('optgroup[data-type=languages] option').attr('selected', true);
-                    $tierSelector.find('optgroup[data-type=speakers] option').attr('selected', true)
+                    $tierSelector.find('optgroup[data-type=speakers] option').attr('selected', false);
+                    $('*[data-transcripts-id=' + trid + ']').find('.speaker-display').hide();
                     $tierSelector.change(function (e) {
                             //language selection
                             $('*[data-transcripts-id=' + trid + ']').find('.tier').hide(); //removeClass('active');

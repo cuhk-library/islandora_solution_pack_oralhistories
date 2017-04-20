@@ -363,6 +363,7 @@ function islandora_transcript_navigation(array &$variables) {
   $out .= "<button type='button' class='btn btn-default previous' title='Previous line'><span class='glyphicon glyphicon-arrow-left'></span> " . t('Prev') . "</button>";
   $out .= "<button type='button' class='btn btn-default sameagain' title='Same line'><span class='glyphicon glyphicon-repeat'></span> " . t('Same') . "</button>";
   $out .= "<button type='button' class='btn btn-default next' title='Next line'><span class='glyphicon glyphicon-arrow-right'></span> " . t('Next') . "</button>";
+  $out .= "<button type='button' class='btn btn-default playall' title='Play All'><span class='glyphicon glyphicon-play'></span> " . t('Play All') . "</button>";
   if (isset($object['TRANSCRIPT']) && islandora_datastream_access(ISLANDORA_REPLACE_DATASTREAM_CONTENT, $object['TRANSCRIPT'])) {
     ctools_include('modal');
     ctools_modal_add_js();

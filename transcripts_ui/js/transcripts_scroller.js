@@ -7,14 +7,14 @@
 
         function createUI($transcript) {
             var transid = $transcript.attr('data-transcripts-id');
-
+            
             var html5 = {
                 player: null,
-
+                
                 setVideo: function (element) {
                     var that = this;
+                    console.log(that);
                     player = element;
-
                     var playPause = function (e) {
                         if (!player.paused) { //if playing
                             that.checkNow(player.currentTime);
@@ -23,15 +23,27 @@
 
                     var timeUpdated = function (e) {
                         var now = player.currentTime;
-
+                        //console.log('now '+now);
+                        var id = $('.video-js').prop('id');
+                        videoPlayer = videojs(id);
                         //if playmode=playstop, then don't keep scrolling when you stop
-                        if (!player.paused && that.one != null && now > that.one.attr('data-end')) {
-                            player.pause();
+                        //if (!player.paused && that.one != null && now > that.one.attr('data-end')) {
+                        //console.log(that);
+                        if(that.one == null){
+                            console.log("that.one is null");
+                        }else{
+                            console.log("that.one is true");
+                        }
+                        if (!videoPlayer.paused() && that.one != null && now > that.one.attr('data-end')) {
+                            //console.log('now > data end '+now+' '+that.one.attr('data-end'));
+                            //player.pause();
+                            videoPlayer.pause();
                             that.lastNow = now;
                         }
 
                         //clean highlights and scroll
-                        if (!player.paused || Math.abs(that.lastNow - now) > .2) {
+                        //if (!player.paused || Math.abs(that.lastNow - now) > .2) {
+                        if (!videoPlayer.paused() || Math.abs(that.lastNow - now) > .2) {
                             that.checkScroll(now);
                         }
                     };
@@ -47,19 +59,36 @@
                         }
                     });
                 },
-
+                
+                playAll: function (){
+                    if (player != null) {
+                        //player.currentTime = seconds;
+                        var id = $('.video-js').prop('id');
+                        videoPlayer = videojs(id);
+                        if (videoPlayer.paused()){
+                            videoPlayer.play();
+                        }
+                    }
+                },
+                
                 playFrom: function (seconds) {
                     if (player != null) {
-                        player.currentTime = seconds;
-                        if (player.paused) player.play();
+                        //player.currentTime = seconds;
+                        var id = $('.video-js').prop('id');
+                        videoPlayer = videojs(id);
+                        videoPlayer.currentTime(seconds);
+                        if (videoPlayer.paused()){
+                            console.log("play paused");
+                            videoPlayer.play();
+                        }
                     }
                 },
 
-                setCurrentTime: function (seconds) {
+                /*setCurrentTime: function (seconds) {
                     if (player != null) {
                         player.currentTime = seconds;
                     }
-                }
+                }*/
             };
 
             var scroller = {
@@ -71,7 +100,7 @@
                 playIndex: 0,
                 startPointer: 0,
                 lastNow: 0,
-
+                
                 starts: $('*[data-begin]', $transcript).not('.deleted').map(function (element, index) {
                     var o = {};
                     o.$item = $(this);
@@ -98,9 +127,12 @@
                     //to support transcript editing where times could be modified
                     if (begin === undefined) begin = $item.attr('data-begin');
                     if (end === undefined) end = $item.attr('data-end');
-
+                    
                     if (end-begin > 0) {
+                        
                         this.one = $item;
+                        console.log(this.one);
+                        console.log("end begin "+end+" "+begin);
                         this.endAll();
                         if (reset) {
                             this.sweetSpot = $item.position().top;
@@ -122,6 +154,10 @@
                 checkNow: function (now) {
                     if (this.one != null && (now < parseFloat(this.one.attr('data-begin')) || now > parseFloat(this.one.attr('data-end')))) {
                     //if (this.one != null && (now < parseFloat(this.one.attr('data-begin')) - .1 || now > parseFloat(this.one.attr('data-end')) + .1)) {
+                        console.log(now);
+                        console.log(this.one);
+                        console.log('this one begin '+this.one.attr('data-begin'));
+                        console.log('this one end '+this.one.attr('data-end'));
                         this.one = null;
                     }
                 },
@@ -188,7 +224,9 @@
                         that.endPlay($(this));
                     });
                 },
-
+                continuePlay: function (){
+                    this.playAll();
+                },
                 previous: function () {
                     var n = this.playIndex > 0 ? this.playIndex - 1 : 0;
                     this.resetSweet = false; //will be set back to true after line is played
