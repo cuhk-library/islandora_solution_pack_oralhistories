@@ -13,7 +13,6 @@
                 
                 setVideo: function (element) {
                     var that = this;
-                    console.log(that);
                     player = element;
                     var playPause = function (e) {
                         if (!player.paused) { //if playing
@@ -29,11 +28,6 @@
                         //if playmode=playstop, then don't keep scrolling when you stop
                         //if (!player.paused && that.one != null && now > that.one.attr('data-end')) {
                         //console.log(that);
-                        if(that.one == null){
-                            console.log("that.one is null");
-                        }else{
-                            console.log("that.one is true");
-                        }
                         if (!videoPlayer.paused() && that.one != null && now > that.one.attr('data-end')) {
                             //console.log('now > data end '+now+' '+that.one.attr('data-end'));
                             //player.pause();
@@ -78,7 +72,6 @@
                         videoPlayer = videojs(id);
                         videoPlayer.currentTime(seconds);
                         if (videoPlayer.paused()){
-                            console.log("play paused");
                             videoPlayer.play();
                         }
                     }
@@ -131,8 +124,6 @@
                     if (end-begin > 0) {
                         
                         this.one = $item;
-                        console.log(this.one);
-                        console.log("end begin "+end+" "+begin);
                         this.endAll();
                         if (reset) {
                             this.sweetSpot = $item.position().top;
@@ -154,10 +145,6 @@
                 checkNow: function (now) {
                     if (this.one != null && (now < parseFloat(this.one.attr('data-begin')) || now > parseFloat(this.one.attr('data-end')))) {
                     //if (this.one != null && (now < parseFloat(this.one.attr('data-begin')) - .1 || now > parseFloat(this.one.attr('data-end')) + .1)) {
-                        console.log(now);
-                        console.log(this.one);
-                        console.log('this one begin '+this.one.attr('data-begin'));
-                        console.log('this one end '+this.one.attr('data-end'));
                         this.one = null;
                     }
                 },
