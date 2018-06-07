@@ -1,8 +1,11 @@
-# Oral Histories Solution Pack [![Build Status](https://travis-ci.org/digitalutsc/islandora_solution_pack_oralhistories.svg?branch=master)](https://travis-ci.org/digitalutsc/islandora_solution_pack_oralhistories)
+# Oral Histories Solution Pack 
+[![DOI](https://zenodo.org/badge/23933503.svg)](https://zenodo.org/badge/latestdoi/23933503) [![Build Status](https://travis-ci.org/Islandora-Labs/islandora_solution_pack_oralhistories.svg?branch=master)](https://travis-ci.org/Islandora-Labs/islandora_solution_pack_oralhistories) 
 
 ## Introduction
 
 Provides a content model for Oral Histories and a viewer for displaying timed text content (XML or WebVTT) alongside video and audio files. 
+
+The software leverages the existing Video and Audio solution packs to create derivatives from source files, and provides the ability to append a transcript and closed captioning file that is then exposed in a video.js based player. Transcripts can contain multiple tiers corresponding to different languages and speakers. The module is designed to acommodate any time-encoded description of a video or audio file. 
 
 ## Requirements
 
@@ -48,16 +51,15 @@ There are some configuration options in Administration » Islandora » Oral Hist
   * "Create WEBVTT file for captions or subtitles" -- if you'd like the module to automatically create a caption file
   * "Enable captions/subtitles display" -- if you'd like to display the captions
   * "Enable transcript display" -- **this one is the most important** because it's what allows your transcript scroller to display
-  * "Display media and transcript side-by-side" -- if you don't like the default display of having the scrolling transcript below the video/audio player, check this to move the scroller to the side
   
 ### Themes
 
-The viewer currently works with any bootstrap theme. For non bootstrap themes, additional files are provided to enable bootstrap elements required by the viewer. View the [project wiki](https://github.com/digitalutsc/islandora_solution_pack_oralhistories/wiki) for additional details. 
+The viewer currently works with the [Bootstrap theme](https://www.drupal.org/project/bootstrap). For non-Bootstrap themes, including certain Bootstrap-based themes,  additional files are provided to enable bootstrap elements required by the viewer. View the [project wiki](https://github.com/digitalutsc/islandora_solution_pack_oralhistories/wiki) for additional details. 
 
 
 ## Transcript File Formats
 
-This module supports transcript files in [WebVTT](https://w3c.github.io/webvtt/) and in an XML format like that below:
+This module supports transcript files in [WebVTT](https://w3c.github.io/webvtt/) and in a custom  XML format. For additional information on ingest processes, visit our [project wiki](https://github.com/digitalutsc/islandora_solution_pack_oralhistories/wiki#ingest-behaviour-for-xml-vs-webvtt-transcripts). The XML format should look similar to the following:
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -94,6 +96,7 @@ In order to view transcripts in the user-interface, double check that anonymous 
 Current maintainers:
 * [Marcus Barnes](https://github.com/MarcusBarnes)
 * [Nat Kanthan](https://github.com/Natkeeran)
+* [Megan Kudzia](https://github.com/mkudzia)
 
 Sponsors:
 * The [Digital Scholarship Unit (DSU)](https://www.utsc.utoronto.ca/digitalscholarship/) at the University of Toronto Scarborough Library
@@ -101,6 +104,12 @@ Sponsors:
 Contributors:
 * [Lingling Jiang](https://github.com/sprklinginfo)
 * Edward Garrett
+
+Note: This module would not have been possible without the support of [Chris Berkowitz](http://www.utsc.utoronto.ca/hcs/christine-berkowitz) from the Scarborough Oral Histories Project at the [Department of Historical and Cultural Studies](http://www.utsc.utoronto.ca/hcs/) at UTSC.
+
+## Contributing
+
+We welcome community development partners.  The [CONTRIBUTING.md](https://github.com/digitalutsc/islandora_solution_pack_oralhistories/blob/7.x/CONTRIBUTING.md) file provides guidelines on how you can contribute to the development of the Islandora Oral Histories Solution Pack.
 
 ## License
 

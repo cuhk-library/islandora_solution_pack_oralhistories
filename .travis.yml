@@ -1,17 +1,31 @@
 #islandora_solution_pack_oralhistories
 
 sudo: true
-
+dist: trusty
 language: php
 
 php:
-  - 5.3.3
   - 5.4
   - 5.5
 
+matrix:
+  include:
+    - php: "5.3.3"
+      dist: precise
+      env: FEDORA_VERSION="3.5"
+    - php: "5.3.3"
+      dist: precise
+      env: FEDORA_VERSION="3.6.2"
+    - php: "5.3.3"
+      dist: precise
+      env: FEDORA_VERSION="3.7.0"
+    - php: "5.3.3"
+      dist: precise
+      env: FEDORA_VERSION="3.8.1"
+
 branches:
   only:
-    - master
+    - 7.x
 
 env:
   - FEDORA_VERSION="3.5"
@@ -42,7 +56,7 @@ before_install:
   - ln -s $HOME/ctools sites/all/modules/ctools
 
   - sudo sh $HOME/islandora_solution_pack_video/tests/scripts/ffmpeg-install.sh
-  
+
   - drush en --user=1 --yes islandora_oralhistories
   - drush en --user=1 --yes islandora_basic_collection
   - drush en --user=1 --yes islandora_video
@@ -56,7 +70,7 @@ script:
   - $ISLANDORA_DIR/tests/scripts/line_endings.sh sites/all/modules/islandora_solution_pack_oralhistories
   - drush coder-review --reviews=production,security,style,i18n,potx,sniffer islandora_basic_oralhistories
   - phpcpd --names *.module,*.inc,*.test sites/all/modules/islandora_solution_pack_oralhistories
-  - drush test-run --uri=http://localhost:8081 "Islandora Oralhistories"
+  # - drush test-run --uri=http://localhost:8081 "Islandora Oralhistories"
 
-notifications:
-  irc: "irc.freenode.org#islandora"
+#notifications:
+#  irc: "irc.freenode.org#islandora"

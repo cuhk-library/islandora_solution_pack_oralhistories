@@ -27,6 +27,13 @@ function islandora_oralhistories_transcript_edit_form(array $form, array &$form_
   $form = array();
   $form['#tree'] = TRUE;
 
+  // Button to toggle cues.
+  $form['toggle-cues'] = array(
+    '#type' => 'button',
+    '#value' => 'Toggle Cues',
+    '#attributes' => array('onclick' => 'return (false);'),
+  );
+
   if ($xml) {
     if ($xml->solespeaker) {
       $form['solespeaker'] = array(
@@ -82,6 +89,12 @@ function islandora_oralhistories_transcript_edit_form(array $form, array &$form_
     '#type' => 'submit',
     '#value' => t('Submit'),
   );
+
+  // Handles toggle behavior.
+  $form['#attached']['js'] = array(
+    drupal_get_path('module', 'islandora_oralhistories') . '/js/transcript_edit.js',
+  );
+
   return $form;
 }
 
@@ -107,7 +120,11 @@ function islandora_oralhistories_transcript_edit_form_submit(array $form, array 
       if (preg_match('/cue/', $key)) {
         $cue = $cues->appendChild($dom->createElement('cue'));
         foreach ($form_state['values'][$key] as $cue_name => $value) {
-          $cue_name = $cue->appendChild($dom->createElement($cue_name, $value));
+          // issue#58
+          $child = $cue->appendChild($dom->createElement($cue_name));
+          $child_node = dom_import_simplexml($child);
+          $child_owner = $child_node->ownerDocument;
+          $child_node->appendChild($child_owner->createCDATASection($value));
         }
 
       }
@@ -118,6 +135,9 @@ function islandora_oralhistories_transcript_edit_form_submit(array $form, array 
     try {
       $datastream->setContentFromString($dom->saveXML());
       drupal_set_message(t('datastream %s is updated.', array('%s' => $datastream->id)), 'status', FALSE);
+      $nodePath = current_path();
+      $nodePath = str_replace("/edit_form/TRANSCRIPT", "", $nodePath);
+      $form_state['redirect'] = $nodePath;
     }
     catch (Exception $e) {
       drupal_set_message(t('Error updating datastream %s %t', array('%s' => $datastream->id, '%t' => $e->getMessage())), 'error', FALSE);
@@ -126,6 +146,7 @@ function islandora_oralhistories_transcript_edit_form_submit(array $form, array 
   }
 
 }
+
 
 /**
  * Callback for menu 'islandora/object/%islandora_object/edit_form/%islandora_datastream/%ctools_js'.
@@ -169,6 +190,9 @@ function edit_transcript_modal(AbstractObject $object, AbstractDatastream $datas
       // Create ajax command array, dismiss the modal window.
       $output = array();
       $output[] = ctools_modal_command_dismiss();
+      $nodePath = current_path();
+      $nodePath = str_replace("/edit_form/TRANSCRIPT/ajax", "", $nodePath);
+      $output[] = ctools_ajax_command_redirect($nodePath);
     }
 
 

@@ -61,7 +61,9 @@ function islandora_oralhistories_preprocess_islandora_oralhistories(array &$vari
   $viewer_params = array(
     'pid' => $object->id,
   );
-  
+
+  // Deferred derivative generation makes it possible that there won't be a
+  // media dsid immediately.
   $media_dsid = 'MP4';
   if(isset($object['OBJ'])){
     if (preg_match('/^video/i', $object['OBJ']->mimetype)) {
@@ -77,7 +79,6 @@ function islandora_oralhistories_preprocess_islandora_oralhistories(array &$vari
             $max_file_size = ((int) variable_get('islandora_video_max_obj_size', 500)) * 1024 * 1024;
             if ($object['OBJ']->size < $max_file_size) {
               $media_dsid = 'OBJ';
-            }
           }
         }
       }
@@ -93,7 +94,7 @@ function islandora_oralhistories_preprocess_islandora_oralhistories(array &$vari
   }
 
   try {
-    if (isset($object[$media_dsid]) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $object[$media_dsid])) {
+    if ($media_dsid && isset($object[$media_dsid]) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $object[$media_dsid])) {
       $media_url = url("islandora/object/{$object->id}/datastream/$media_dsid/view", array('absolute' => TRUE));
       $viewer_params += array(
         'mime' => $object[$media_dsid]->mimetype,
@@ -117,6 +118,7 @@ function islandora_oralhistories_preprocess_islandora_oralhistories(array &$vari
   $transcript_mimetype = '';
   foreach ($object as $datastream) {
 
+    $isMediatrack = FALSE;
     $get_track = FALSE;
     if (preg_match('/^TRANSCRIPT/', $datastream->id)) {
       if (strpos($datastream->mimetype, 'xml') !== FALSE) {
@@ -124,12 +126,14 @@ function islandora_oralhistories_preprocess_islandora_oralhistories(array &$vari
       }
       else {
         $transcript_mimetype = 'vtt';
+        $isMediatrack = TRUE;
       }
       $get_track = TRUE;
     }
 
     if (preg_match('/^MEDIATRACK/', $datastream->id)) {
       $get_track = TRUE;
+      $isMediatrack = TRUE;
     }
 
     // Ensure that even if MEDIATRACK is not present, show TRANSCRIPT
@@ -141,29 +145,42 @@ function islandora_oralhistories_preprocess_islandora_oralhistories(array &$vari
       $source_url = url("islandora/object/{$object->id}/datastream/$datastream->id/view", array('absolute' => TRUE));
 
       $track['dsid'] = $datastream->id;
+      $track['dslabel'] = $datastream->label;
       $track['source_url'] = $source_url;
 
-      // Language Code.
-      $lang_code = 'en';
-      $dsid_arr = explode("_", $track['dsid']);
-      if (isset($dsid_arr[1])) {
-        $track['lang_code'] = strtolower($dsid_arr[1]);
-      }
-      else {
-        $track['lang_code'] = $lang_code;
-      }
+      $track['MEDIATRACK'] = FALSE;
+      if ($isMediatrack) {
+        $track['MEDIATRACK'] = TRUE;
 
-      // Default Language.
-      $track_defaults_setting_str = "";
-      if (NULL !== variable_get('islandora_oralhistories_vtt_default_language')) {
-        $track_defaults_setting_str = variable_get('islandora_oralhistories_vtt_default_language');
-      }
-      $track_defaults_setting_str = str_replace(' ', '', $track_defaults_setting_str);
-      $track_defaults_setting_str = explode(",", $track_defaults_setting_str);
+        // Language Code.
+        $lang_code = 'en';
+        $dsid_arr = explode("_", $track['dsid']);
+        $dslabel_arr = explode("_", $track['dslabel']);
+        if (isset($dsid_arr[1])) {
+          $track['lang_code'] = strtolower($dsid_arr[1]);
+        } elseif ($track['dsid'] == "TRANSCRIPT" && isset($dslabel_arr[1])) {
+          $fileName = strtolower($dslabel_arr[1]);
+          $language_code = pathinfo($fileName, PATHINFO_FILENAME);
+          $track['lang_code'] = $language_code;
+        } else {
+          $track['lang_code'] = $lang_code;
+        }
 
-      $track['default'] = "";
-      if (in_array($track['lang_code'], $track_defaults_setting_str)) {
-        $track['default'] = "default";
+        // Default Language.
+        $track_defaults_setting_str = "";
+        if (NULL !== variable_get('islandora_oralhistories_vtt_default_language')) {
+          $track_defaults_setting_str = variable_get('islandora_oralhistories_vtt_default_language');
+        }
+        $track_defaults_setting_str = str_replace(' ', '', $track_defaults_setting_str);
+        $track_defaults_setting_str = explode(",", $track_defaults_setting_str);
+
+        $track['default'] = "";
+        if (in_array($track['lang_code'], $track_defaults_setting_str)) {
+          $track['default'] = "default";
+        }
+      } else {
+        $track['lang_code'] = '';
+        $track['default'] = '';
       }
 
       if (isset($object[$datastream->id]) && islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $object[$datastream->id])) {
@@ -203,12 +220,7 @@ function islandora_oralhistories_preprocess_islandora_oralhistories(array &$vari
     'enable_transcript_display' => variable_get('islandora_oralhistories_enbable_transcript_display'),
   );
 
-  if (variable_get('islandora_oralhistories_transcript_layout_side')) {
-    $viewer = theme('islandora_html5_video_side', array('params' => $viewer_params));
-  }
-  else {
-    $viewer = theme('islandora_html5_video_stack', array('params' => $viewer_params));
-  }
+  $viewer = theme('islandora_html5_video_stack', array('params' => $viewer_params));
 
   $variables['islandora_content']['viewer'] = $viewer;
 
@@ -244,20 +256,10 @@ function islandora_oralhistories_preprocess_islandora_native_html5(array &$varia
 /**
  * Implements hook_process_HOOK().
  */
-function islandora_oralhistories_process_islandora_html5_video_side(&$variables) {
-  // The trid-PID with : being replaced by -
-  $variables['params']['trid'] = 'trid-' . str_replace(':', '-', $variables['params']['pid']);
-}
-
-
-/**
- * Implements hook_process_HOOK().
- */
 function islandora_oralhistories_process_islandora_html5_video_stack(&$variables) {
   // The trid-PID with : being replaced by -
   $variables['params']['trid'] = 'trid-' . str_replace(':', '-', $variables['params']['pid']);
 }
-
 
 /**
  * Implements theme_islandora_oralhistories_transcript_edit_form().
