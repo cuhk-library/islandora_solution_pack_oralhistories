@@ -79,6 +79,7 @@ function islandora_oralhistories_preprocess_islandora_oralhistories(array &$vari
             $max_file_size = ((int) variable_get('islandora_video_max_obj_size', 500)) * 1024 * 1024;
             if ($object['OBJ']->size < $max_file_size) {
               $media_dsid = 'OBJ';
+            }
           }
         }
       }
