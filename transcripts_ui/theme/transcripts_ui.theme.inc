@@ -1,12 +1,12 @@
 <?php
 
-function theme_transcripts_ui_transcript_controls($vars)
+function theme_transcripts_ui_transcript_controls($vars = array())
 {
     $out = drupal_render($vars['element']['content']);
     return $out;
 }
 
-function theme_transcripts_ui_transcript_options($vars)
+function theme_transcripts_ui_transcript_options($vars = array())
 {
 
     $out  = "<select multiple class='selectpicker tier-selector' data-header='Select languages'>";
@@ -30,7 +30,7 @@ function theme_transcripts_ui_transcript_options($vars)
     return $out;
 }
 
-function theme_transcripts_ui_transcript_navigation($vars)
+function theme_transcripts_ui_transcript_navigation($vars = array())
 {
     $out = "<div class='btn-group' role='group'>";
     $out .= "<button type='button' class='btn btn-default previous' title='Previous line'><span class='glyphicon glyphicon-arrow-left'></span> " . t('Prev') . "</button>";
@@ -40,13 +40,13 @@ function theme_transcripts_ui_transcript_navigation($vars)
     return $out;
 }
 
-function theme_transcripts_ui_transcript_search($vars)
+function theme_transcripts_ui_transcript_search($vars = array())
 {
     $out = drupal_render($vars['element']['search_form']);
     return $out;
 }
 
-function theme_transcripts_ui_speaker_name($vars)
+function theme_transcripts_ui_speaker_name($vars = array())
 {
     $vars['classes'][] = 'speaker-display';
     $vars['classes'][] = 'active';
@@ -61,8 +61,10 @@ function theme_transcripts_ui_speaker_name($vars)
     return $out;
 }
 
-function theme_transcripts_ui_tcu_tier($vars)
+function theme_transcripts_ui_tcu_tier($vars = array())
 {
+    
+    $vars['classes'] = array();
     $vars['classes'][] = 'tier';
     $vars['classes'][] = 'active';
     $classes = implode(' ', $vars['classes']);
@@ -70,7 +72,7 @@ function theme_transcripts_ui_tcu_tier($vars)
     return $out;
 }
 
-function theme_transcripts_ui_play_tcu($vars)
+function theme_transcripts_ui_play_tcu($vars = array())
 {
     $mins = floor($vars['element']['#time'] / 60);
     $secs = $vars['element']['#time'] % 60;
