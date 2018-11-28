@@ -48,6 +48,7 @@ function theme_transcripts_ui_transcript_search($vars = array())
 
 function theme_transcripts_ui_speaker_name($vars = array())
 {
+    $vars['classes'] = array();
     $vars['classes'][] = 'speaker-display';
     $vars['classes'][] = 'active';
     $classes = implode(' ', $vars['classes']);
